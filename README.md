@@ -4,12 +4,23 @@
 
 ### 环境准备
 
-数据库使用安装了 zhparser 插件的 postgresql，可以通过 dockerhub 中的 codecolorist/zhparser-docker 直接获取，也可从 [zhparser-docker 源码](https://github.com/chichou/zhparser-docker/) 构建。
+数据库使用安装了 zhparser 插件的 postgresql，可以通过 dockerhub 中的 codecolorist/zhparser-docker 直接获取，也可从 [zhparser-docker 源码](https://github.com/chichou/zhparser-docker/) 构建。前端库需要使用 npm 进行安装，但 node 不是生产环境所必须的。可先在具有 node 环境的计算机上执行 `npm install`，随后复制 `web/node_modules` 目录即可。
 
 1. 安装 docker 和 [docker-compose](https://docs.docker.com/compose/)
 2. 安装 git, 克隆仓库
 3. 源码构建或 `docker pull zhparser-docker`，使用 docker tag 重命名 image 为 zhparser-docker
-4. `docker-composer up` 运行
+4. `docker-compose build && docker-compose up -d` 运行
+
+第一次启动需要初始化数据库和安装前端依赖：
+
+```
+docker-compose run --rm web python manage.py migrate
+cd web && npm install
+```
+
+添加超级管理员（可选）
+
+`docker-compose run --rm web python manage.py createsuperuser`，随后按照向导完成添加。
 
 ## 开发环境
 
