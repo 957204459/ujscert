@@ -1,0 +1,9 @@
+{% if vul.status == 0 %}
+  <span class="label label-default">待审核</span>
+{% elif vul.status == 1 %}
+  <span class="label label-danger">已确认</span>
+{% elif vul.status == 2 %}
+  <span class="label label-info">已忽略</span>
+{% else %}
+  <span class="label label-success">已修复</span>
+{% endif %}

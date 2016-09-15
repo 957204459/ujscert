@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}漏洞报告平台 - 用户登录{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/signin.css' %}">
+{% endblock %}
+
+{% block body %}
+  <section class="login">
+    <div class="container">
+      <form class="form-signin" method="post">
+        <h2 class="form-signin-heading">用户登录</h2>
+
+        {{ form.non_field_errors }}
+
+        <label for="id_username" class="sr-only">用户名</label>
+        {{ form.username.errors }}
+        <input type="text" id="id_username" name="username" class="form-control" placeholder="用户名" required=""
+               autofocus="">
+
+        <label for="id_passwd" class="sr-only">密码</label>
+        {{ form.password.errors }}
+        <input type="password" id="id_passwd" class="form-control" name="password" placeholder="密码" required="">
+
+        <input type="hidden" name="next" value="{{ next | default:"/" }}">
+
+        {{ form.captcha.errors }}
+        {{ form.captcha }}
+
+        {% if err %}<p class="alert alert-danger text-xs-center">登录失败</p>{% endif %}
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+
+        {% csrf_token %}
+      </form>
+
+    </div>
+
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'js/captcha.js' %}"></script>
+{% endblock %}

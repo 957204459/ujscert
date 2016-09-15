@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}用户注册{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+        <div class="container">
+          <h1 class="m-t-3 m-b-1">
+            <small>注册</small>
+          </h1>
+
+          <form method="POST">
+            {{ form.non_field_errors }}
+
+            <fieldset class="form-group">
+              <label for="email-address">邮件地址</label>
+              <input id="email-address" class="form-control" readonly value="{{ invite.email }}">
+            </fieldset>
+
+            <fieldset class="form-group">
+              {{ form.username.errors }}
+              <label for="user-name">用户名</label>
+              <input id="user-name" class="form-control" name="username"
+                     placeholder="用户名" value="{{ form.username.value | default:'' }}">
+              <small class="text-muted">30 字以内的数字、区分大小写的字母和 <code>@.+-_</code></small>
+            </fieldset>
+
+            <fieldset class="form-group">
+              {{ form.password1.errors }}
+              <label for="user-password-1">密码</label>
+              <input type="password" class="form-control" id="user-password-1" name="password1"
+                     placeholder="密码" value="{{ form.password1.value | default:'' }}">
+            </fieldset>
+
+            <fieldset class="form-group">
+              {{ form.password2.errors }}
+              <label for="user-password-2">重复密码</label>
+              <input type="password" class="form-control" id="user-password-2" name="password2"
+                     placeholder="重复密码" value="{{ form.password2.value | default:'' }}">
+            </fieldset>
+
+            {% csrf_token %}
+            <p class="text-muted"><small>注册即表明已阅读并同意<a href="{% url 'about' %}#legal-declation">
+              信息安全相关保护和声明</a></small></p>
+            <button type="submit" class="btn btn-primary">注册</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'mail/base.html' %}
+
+{% block title %}邀请注册{% endblock %}
+
+{% block body %}
+  <p>漏洞报告平台收到了新的报告，请到 <a href="{{ review_url }}">{{ review_url }}</a> 查看。</p>
+  <p><small>（如链接无法点击，请手动复制到浏览器地址栏）</small></p>
+  <p>&nbsp;</p>
+  <p>江苏大学信息化中心</p>
+
+  <hr>
+
+  <p class="footer">本邮件由平台自动发送，请勿回复。<br>
+    您之所以收到这封邮件是因为您注册了江苏大学漏洞响应平台。<br>
+    如果这不是您的邮件地址，请删除这封邮件并联系管理员。<br>
+    其他关于漏洞报告平台的更多详细信息请访问&nbsp;
+    <a href="http://security.ujs.edu.cn/about" target="_blank">http://security.ujs.edu.cn/about</a></p>
+{% endblock %}

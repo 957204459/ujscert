@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}英雄榜{% endblock %}
+
+{% block body %}
+
+  <div class="container m-t-1 m-b-1">
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-3">英雄榜</h1>
+        <p class="lead">感谢以下用户作出的贡献</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="container">
+
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="col-md-1">#</th>
+            <th class="col-md-3">id</th>
+            <th class="col-md-4">部门</th>
+            <th class="col-md-2">贡献值</th>
+            <th class="col-md-2">报告数</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% for hero in top10 %}
+            <tr>
+              <th class="col-md-1" scope="row">{{ forloop.counter }}</th>
+              <td class="col-md-3">{{ hero.user.username }}</td>
+              <td class="col-md-4">{{ hero.department }}</td>
+              <td class="col-md-2">{{ hero.reputation }}</td>
+              <td class="col-md-2">{{ hero.reports }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <th scope="row" colspan="5">暂无记录</th>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

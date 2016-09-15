@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Security Response Center of Jiangsu University">
+  <meta name="author" content="ChiChou">
+
+  <title>{% block title %}江苏大学信息安全漏洞响应平台{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'css/cover.css' %}">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  {% block head %}{% endblock %}
+
+</head>
+<body>
+
+<div class="site-wrapper">
+  <div class="site-wrapper-inner">
+    <div class="cover-container">
+      <div class="masthead clearfix">
+        <div class="inner">
+          <h3 class="masthead-brand"><a href="{% url 'home' %}">
+            <img src="{% static 'images/logo.png' %}" alt="" height="48px"></a>
+          </h3>
+
+          <nav class="nav nav-masthead">
+            <div class="dropdown pull-xs-right">
+              {% if request.user.is_authenticated %}
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="user-dropdown"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                  <img src="{{ self_profile.avatar }}?s=20" class="avatar" width="20" height="20"> {{ request.user.username }}
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown">
+                  <a class="dropdown-item" href="{% url 'profile' %}">个人资料</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{% url 'logout' %}">退出</a>
+                </div>
+
+              {% else %}
+                <a class="nav-link" href="{% url 'login' %}">登录</a>
+
+              {% endif %}
+            </div>
+
+            <a class="nav-link active" href="{% url 'home' %}">首页</a>
+            <a class="nav-link" href="{% url 'about' %}">关于</a>
+          </nav>
+
+        </div>
+      </div>
+
+      <div class="inner cover">
+        <h1 class="cover-heading">江苏大学网络安全漏洞响应平台</h1>
+        <p class="lead">诚邀学校师生共同维护校园网络安全</p>
+
+        <p class="lead entrance">
+          {% if user.is_staff %}
+            <a href="{% url 'review' status=0 author='all' %}" class="btn btn-lg btn-default">审核报告
+              <span class="label label-danger">{{ to_be_review }}</span></a>
+            <a href="{% url 'search_home' %}" class="btn btn-lg btn-default">内网资产</a>
+          {% else %}
+            <a href="{% url 'submit' %}" class="btn btn-lg btn-default">提交漏洞</a>
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="mastfoot">
+        <div class="inner">
+          <p>&copy; 2016 江苏大学信息化中心</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'tether/dist/js/tether.min.js' %}"></script>
+<script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>

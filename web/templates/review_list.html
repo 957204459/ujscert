@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}审核列表{% endblock %}
+
+{% block body %}
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li class="active">审核漏洞</li>
+    </ol>
+
+    <div class="row">
+      <div class="col-md-4 col-lg-3">
+        <button class="btn btn-primary hidden-md-up m-b-1" type="button" data-toggle="collapse"
+                data-target="#filter-panel" aria-expanded="false" aria-controls="filter-panel">过滤器</button>
+
+        <div class="collapse navbar-toggleable-sm m-b-1" id="filter-panel">
+          <h5 class="small">响应周期</h5>
+
+          <div class="list-group m-b-1">
+            {% for choice, label in status_choices %}
+              <a href="{% url 'review' status=choice author=author %}"
+                 class="list-group-item{% if status == choice %} active {% endif %}">{{ label }}</a>
+            {% endfor %}
+          </div>
+
+          <h5 class="small">漏洞来源</h5>
+          <div class="list-group">
+            {% for choice, label in author_choices %}
+              <a href="{% url 'review' author=choice status=status %}"
+                 class="list-group-item{% if author == choice %} active {% endif %}">{{ label }}</a>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-8 col-lg-9">
+        <ul class="list-unstyled">
+          {% for vul in items %}
+            <li>
+              <span class="pull-xs-right">{{ vul.submitted | date:'DATE_FORMAT' }}</span>
+              {% include 'mixins/status.html' %}
+              <a href="{% if vul.anonymous %}
+                  {% url 'detail' author='anonymous' vid=vul.id %}
+                {% else %}
+                  {% url 'detail' author='member' vid=vul.id %}
+                {% endif %}">{{ vul.title }}</a>
+
+            </li>
+          {% empty %}
+            <li class="alert alert-info">没有符合条件的结果</li>
+          {% endfor %}
+
+        </ul>
+
+        {% include 'paginator.html' %}
+
+      </div>
+
+    </div>
+
+  </div>
+{% endblock %}
+

@@ -1,0 +1,46 @@
+web_prod:
+  working_dir: /web
+  build: ./docker/web
+  volumes:
+    - ./web:/web
+    - ./docker/data/media:/web/media
+    - ./docker/data/log/gunicorn:/var/log/gunicorn
+  expose:
+    - "8000"
+  command: "gunicorn ujscert.wsgi:application --name ujscert
+    --bind 0.0.0.0:8000 --workers 5 --log-level=info
+    --log-file=/var/log/gunicorn/gunicorn.log
+    --access-logfile=/var/log/gunicorn/access.log"
+  links:
+    - db
+
+ws_prod:
+  image: node:6.1
+
+nginx_prod:
+  image: nginx
+  ports:
+    - '80:80'
+    - '443:443'
+  links:
+    - web
+    - ws
+  volumes:
+    - ./web:/web
+    - ./docker/data/log/nginx:/var/log/nginx
+    - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    - ./docker/nginx/mime.types:/etc/nginx/conf/mime.types
+  environment:
+    NGINX_HOST: 'security.ujs.edu.cn'
+    NGINX_PORT: 80
+
+db_prod:
+  build: ./docker/postgres
+  volumes:
+    - ./docker/data/pg/data:/var/lib/postgresql/data
+  expose:
+    - 5432
+  environment:
+    POSTGRES_USER: 'ujssrc'
+    POSTGRES_PASSWORD: 'strongpasswordhere'
+    POSTGRES_DB: 'ujscert'

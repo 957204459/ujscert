@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load jsonify %}
+{% block title %}详细信息: {{ ip }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'jquery-jsonview/dist/jquery.jsonview.css' %}">
+{% endblock %}
+
+{% block body %}
+
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li><a href="{% url 'search_home' %}">内网资产</a></li>
+      <li class="active">主机: {{ ip }}</li>
+    </ol>
+
+    {% for record in ports %}
+      <div id="port-{{ record.port }}" class="card">
+        <div class="card-header" data-service="{{ record.service }}" data-port="{{ record.port }}">
+          <span class="label label-primary">{{ record.port }}</span>
+          <span class="label label-success">{{ record.service }}</span>
+        </div>
+
+        <div class="card-block">
+          <dl class="dl-horizontal m-l-1 m-r-1">
+            {% if record.os %}
+              <dt class="col-sm-3 text-truncate">操作系统</dt>
+              <dd class="col-sm-9">{{ record.os }}</dd>
+            {% endif %}
+
+            {% if record.device %}
+              <dt class="col-sm-3 text-truncate">设备类型</dt>
+              <dd class="col-sm-9">{{ record.device }}
+              </dd>
+            {% endif %}
+
+            {% if record.product %}
+              <dt class="col-sm-3 text-truncate">软件</dt>
+              <dd class="col-sm-9">
+                {{ record.product }}
+
+                {% if record.version %}
+                  <span class="label label-pill label-default">{{ record.version }}</span>
+                {% endif %}
+              </dd>
+            {% endif %}
+
+            {% if record.info %}
+              <dt class="col-sm-3 text-truncate">额外信息</dt>
+              <dd class="col-sm-9">{{ record.info }}</dd>
+            {% endif %}
+
+            {% if record.cpes %}
+              <dt class="col-sm-3 text-truncate">CPE</dt>
+              <dd class="col-sm-9">
+                {% for cpe in record.cpes %}
+                  <span class="label label-primary">{{ cpe }}</span>
+                {% endfor %}
+              </dd>
+            {% endif %}
+
+            {% if record.certificate %}
+              <dt class="col-xs-12">TLS 证书</dt>
+              <dd class="col-xs-12"><div class="certificate">{{ record.certificate|jsonify }}</div></dd>
+            {% endif %}
+
+            <dt class="col-xs-12">旗帜信息</dt>
+            <dd class="col-xs-12"><pre class="m-t-1 m-b-1">{{ record.banner }}</pre></dd>
+
+          </dl>
+
+        </div>
+        <div class="card-footer text-muted">扫描时间: {{ record.timestamp }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'jquery-jsonview/dist/jquery.jsonview.js' %}"></script>
+  <script type="text/javascript">
+    $(function() {
+      $('.certificate').map(function(i, e) {
+        $(e).JSONView(e.textContent);
+      })
+    });
+
+    $('.card-header').each(function(i, e) {
+      if (/(http|ftp)s?/.exec(e.dataset.service)) {
+        var a = document.createElement('a');
+        a.protocol = e.dataset.service;
+        a.hostname = '{{ ip }}';
+        a.port = e.dataset.port;
+        a.target = '_blank';
+        a.textContent = a.href;
+        a.className = 'pull-xs-right';
+        e.appendChild(a);
+      }
+    })
+  </script>
+{% endblock %}

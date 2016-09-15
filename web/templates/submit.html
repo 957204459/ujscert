@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}提交漏洞{% endblock %}
+
+{% block body %}
+
+  <div class="container report">
+    <div class="row">
+      <div class="col-md-3 col-md-push-9 bd-sidebar small">
+        <h5>温馨提示</h5>
+
+        <hr>
+
+        <p>漏洞报告平台关注江苏大学相关网站（*.ujs.edu.cn）服务器的漏洞和有证据的黑客事件。</p>
+
+        <p>你可以提交关于校园网的各种漏洞，包括网络配置，服务器管理甚至是有证据的黑客事件都可以作为有效的信息提交。</p>
+
+        <p>网站的配置不当、SQL 注入、代码执行漏洞、弱口令等都是我们希望尽可能消除的问题。
+          除漏洞外，如果发现相关网站有已经被入侵或篡改的痕迹，如开放异常的后门端口、文章或页面被涂改成不合适的内容、
+          特定路径下出现后门脚本、网页中出现指向非法网站的超级链接等，也欢迎提供报告。</p>
+
+        <p><strong>对服务器的安全测试请遵循相关法律法规的约束。对违反规定造成严重后果的行为，保留依法追究的权利。</strong>
+          <a href="{% url 'legal' %}">信息安全相关保护和声明</a></p>
+      </div>
+
+      <div class="col-md-9 col-md-pull-3 bd-content">
+        {% if not request.user.is_authenticated %}
+          <div class="alert alert-warning" role="alert">
+            您还未登录，将以匿名方式提交漏洞，不能参与社区互动和积分排行。
+            <a href="{% url 'login' %}?next={{ request.path }}">立即登录</a>
+          </div>
+        {% endif %}
+
+        <form method="post" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+          {{ form.as_p }}
+
+          <p><strong>在漏洞未修复之前，请不要向外界传播</strong></p>
+
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">提交漏洞报告</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal fade" id="upload-dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">上传图片</h4>
+        </div>
+        <div class="modal-body">
+          <form id="image-upload">
+            <label class="file">
+              <input type="file" id="image-file" name="img">
+              <span class="file-custom"></span>
+            </label>
+
+            {% csrf_token %}
+            <p class="alert alert-info hidden" id="error-invalid-picture">仅支持常见图片格式,大小不超过 1M</p>
+            <progress class="progress hide" id="image-upload-progress" value="0" max="1">0%</progress>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="insert">插入图片</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="editor-toolbar" class="editor-toolbar">
+    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#upload-dialog">插入图片</button>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'js/editor.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/captcha.js' %}"></script>
+{% endblock %}

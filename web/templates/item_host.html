@@ -1,0 +1,78 @@
+<h4 class="ip">
+  <a href="{% url 'host_detail' ip=item.ip %}">{{ item.ip }}</a>
+  <sup class="external-link">
+    <a class="text-success" href="{{ item.service|default:'unknown' }}://{{ item.ip }}:{{ item.port }}" target="_blank"
+       data-toggle="tooltip" data-placement="right"
+       title="使用浏览器访问 {{ item.service }}://{{ item.ip }}:{{ item.port }}">
+      <i class="fa fa-external-link-square" aria-hidden="true"></i>
+    </a>
+  </sup>
+</h4>
+
+{% if item.hostname %}<p class="text-muted">主机名: {{ item.hostname }}</p>{% endif %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-5">
+      <dl class="dl-horizontal">
+        <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-dot-circle-o"></i> 端口 / 服务</dt>
+        <dd class="col-sm-8">
+          <a href="?q=port:{{ item.port|urlencode }}">
+            <span class="label label-success">{{ item.port }}</span></a>
+          <a href="?q=service:%22{{ item.service|urlencode }}%22">
+            <span class="label label-info">{{ item.service }}</span></a>
+
+          {% if item.certificate %}<span class="label label-danger">TLS</span>{% endif %}
+        </dd>
+
+        {% if item.os %}
+          <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-server"></i> 操作系统</dt>
+          <dd class="col-sm-8"><a href="?q=os:%22{{ item.os|urlencode }}%22">{{ item.os }}</a></dd>
+        {% endif %}
+
+        {% if item.device %}
+          <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-gear"></i> 设备类型</dt>
+          <dd class="col-sm-8"><a
+              href="?q=device:%22{{ item.device|urlencode }}%22">{{ item.device }}</a>
+          </dd>
+        {% endif %}
+
+        {% if item.product %}
+          <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-cubes"></i> 软件</dt>
+          <dd class="col-sm-8">
+            <a href="?q=product:%22{{ item.product|urlencode }}%22">{{ item.product }}</a>
+            {% if item.version %}
+              <span class="label label-pill label-default">{{ item.version }}</span>
+            {% endif %}
+          </dd>
+        {% endif %}
+
+        {% if item.info %}
+          <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-info"></i> 额外信息</dt>
+          <dd class="col-sm-8">{{ item.info }}</dd>
+        {% endif %}
+
+        {% if item.cpes %}
+          <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-cogs"></i> CPE</dt>
+          <dd class="col-sm-8">
+            {% for cpe in item.cpes %}
+              <span class="label label-primary">{{ cpe }}</span>
+            {% endfor %}
+          </dd>
+        {% endif %}
+
+        <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-clock-o"></i> 扫描时间</dt>
+        <dd class="col-sm-8">
+          <time class="text-muted">{{ item.timestamp }}</time>
+        </dd>
+
+      </dl>
+
+    </div>
+
+    <div class="col-md-7">
+      <pre class="row">{{ item.banner }}</pre>
+    </div>
+  </div>
+
+</div>

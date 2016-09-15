@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}内网资产检索{% endblock %}
+
+{% block body %}
+  <div class="bg-muted p-t-1 p-b-1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <form action="{% url 'search' %}">
+            <div class="input-group">
+              <input value="{{ query }}" class="form-control" name="q" type="text"
+                     placeholder="搜索操作组件名、操作系统…">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-secondary" name="t" value="host">搜索端口</button>
+                <button type="submit" class="btn btn-secondary" name="t" value="web">搜索网页</button>
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container m-t-1 search-index">
+    <div class="row">
+
+      <div class="col-lg-6">
+        <p class="m-t-2 m-b-1">端口</p>
+        <div role="group">
+          {% for item in ports %}
+            <a class="label label-default" href="{% url 'search' %}?q=port:{{ item.port }}">{{ item.port }}</a>
+          {% endfor %}
+        </div>
+
+        <p class="m-t-2 m-b-1">设备类型</p>
+        <div role="group">
+          {% for item in devices %}
+            <a class="label label-default" href="{% url 'search' %}?q=device:%22{{ item.device|urlencode }}%22">
+              {{ item.device|default:"(未知)" }}</a>
+          {% endfor %}
+        </div>
+
+        <p class="m-t-2 m-b-1">服务类型</p>
+        <div role="group">
+          {% for item in services %}
+            <a class="label label-default" href="{% url 'search' %}?q=service:%22{{ item.service|urlencode }}%22">
+              {{ item.service|default:"(未知)" }}</a>
+          {% endfor %}
+        </div>
+
+        <p class="m-t-2 m-b-1">操作系统</p>
+        <div role="group">
+          {% for item in oss %}
+            <a class="label label-default" href="{% url 'search' %}?q=os:%22{{ item.os|urlencode }}%22">
+              {{ item.os|default:"(未知)" }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <p class="m-t-2 m-b-1">软件</p>
+        <div role="group">
+          {% for item in products %}
+            <a class="label label-default" href="{% url 'search' %}?q=product:%22{{ item.product|urlencode }}%22">
+              {{ item.product|default:"(未知)" }}</a>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="col-lg-6">
+        <p class="m-t-2 m-b-1">网页应用</p>
+        <div role="group">
+          {% for item in webapps %}
+            <a class="label label-default" href="{% url 'search' %}?q=app:%22{{ item.app }}%22&t=web">{{ item.app }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <style type="text/css" scoped>
+      .search-index h3 {
+        font-weight: 100;
+      }
+
+    </style>
+
+  </div>
+{% endblock %}

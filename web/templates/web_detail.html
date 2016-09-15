@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}详细信息: {{ domain }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'jquery-jsonview/dist/jquery.jsonview.css' %}">
+{% endblock %}
+
+{% block body %}
+
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li><a href="{% url 'search_home' %}">网站资产</a></li>
+      <li class="active">域名: {{ domain }}</li>
+    </ol>
+
+    {% for page in pages %}
+      <div class="card">
+        <div class="card-header">
+          <a href="{{ page.url }}">{{ page.title }}</a><br><small class="text-muted">{{ page.url }}</small>
+        </div>
+
+        <div class="card-block">
+          <dl class="dl-horizontal m-l-1 m-r-1">
+            <dt class="col-sm-3 text-truncate">IP 和端口</dt>
+            <dd class="col-sm-9">
+              <a href="{% url 'host_detail' ip=page.ip %}">{{ page.ip }}</a>
+              <span class="label label-pill label-success">{{ page.port }}</span></dd>
+
+            {% if page.app_set %}
+              <dt class="col-sm-3 text-truncate">应用列表</dt>
+              <dd class="col-sm-9">
+                {% for app in page.app_set.all %}
+                  <a href="{% url 'search' %}?q=app:%22{{ app.app }}%22&t=web">
+                    <span class="label label-pill label-info">{{ app.app }} {{ app.ver }}</span></a>
+                {% endfor %}
+              </dd>
+            {% endif %}
+
+            <dt class="col-xs-12">原始头部</dt>
+            <dd class="col-xs-12"><pre class="m-t-1 m-b-1">{{ page.raw_headers }}</pre></dd>
+
+            {% if page.html %}
+              <dt class="col-xs-12">网页源码</dt>
+              <dd class="col-xs-12"><pre class="m-t-1 m-b-1">{{ page.html }}</pre></dd>
+            {% endif %}
+
+          </dl>
+
+        </div>
+        <div class="card-footer text-muted">扫描时间: {{ page.timestamp }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'jquery-jsonview/dist/jquery.jsonview.js' %}"></script>
+  <script type="text/javascript">
+    $(function() {
+      $('.certificate').map(function(i, e) {
+        $(e).JSONView(e.textContent);
+      })
+    });
+
+    $('.card-header').each(function(i, e) {
+      if (/(http|ftp)s?/.exec(e.dataset.service)) {
+        var a = document.createElement('a');
+        a.protocol = e.dataset.service;
+        a.hostname = '{{ ip }}';
+        a.port = e.dataset.port;
+        a.target = '_blank';
+        a.textContent = a.href;
+        a.className = 'pull-xs-right';
+        e.appendChild(a);
+      }
+    })
+  </script>
+{% endblock %}

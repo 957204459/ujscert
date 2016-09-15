@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <div class="bg-muted p-t-1">
+    <div class="container">
+
+      <div class="row">
+        <div class="col-lg-6">
+          <form class="m-b-1">
+            <div class="input-group">
+              <input value="{{ query }}" class="form-control" name="q" type="text" placeholder="搜索服务器">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-secondary">搜索</button>
+              </span>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="container m-t-2">
+    <div class="alert alert-warning">
+      您的搜索有误,请尝试搜索其他关键字
+    </div>
+  </div>
+{% endblock %}

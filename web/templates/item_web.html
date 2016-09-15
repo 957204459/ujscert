@@ -1,0 +1,36 @@
+<h4 class="ip">
+  <a href="{% url 'web_detail' domain=item.domain %}">{{ item.title|truncatechars:40 }}</a>
+  <sup class="external-link">
+    <a class="text-success" href="{{ item.url }}" target="_blank"
+       data-toggle="tooltip" data-placement="right"
+       title="使用浏览器访问 {{ item.url }}">
+      <i class="fa fa-external-link-square" aria-hidden="true"></i>
+    </a>
+  </sup>
+</h4>
+
+<p class="text-muted">{{ item.domain }}</p>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-5">
+      <dl class="dl-horizontal">
+        <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-server"></i> IP / 端口</dt>
+        <dd class="col-sm-8">{{ item.ip }} <span class="label label-success">{{ item.port }}</span></dd>
+
+        <dt class="col-sm-4 text-truncate"><i class="fa fa-fw fa-gears"></i> 组件</dt>
+        <dd class="col-sm-8">
+          {% for app in item.app_set.all %}
+            <a href="{% url 'search' %}?q=app:%22{{ app.app }}%22&t=web">
+              <span class="label label-pill label-info">{{ app.app }} {{ app.ver }}</span></a>
+          {% endfor %}
+        </dd>
+
+      </dl>
+    </div>
+
+    <div class="col-md-7">
+      <pre class="row">{{ item.raw_headers }}</pre>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+{% if items.has_other_pages %}
+  <nav>
+    <ul class="pagination hidden-md-down">
+      {% if items.has_previous %}
+        <li class="page-item">
+          <a class="page-link" aria-label="上一页"
+             href="?page={{ items.previous_page_number }}&t={{ topic }}&q={{ query|urlencode }}">
+            <span aria-hidden="true">&laquo;</span> 上一页
+          </a>
+        </li>
+      {% endif %}
+
+      {% for page in items.paginator.page_range %}
+        {% if page < 10 %}
+          <li class="page-item {% if items.number == page %}active{% endif %}">
+            <a class="page-link" href="?page={{ page }}&t={{ topic }}&q={{ query|urlencode }}">{{ page }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if items.has_next %}
+        <li class="page-item {% if not items.has_next %}disabled{% endif %}">
+          <a class="page-link" aria-label="下一页"
+             href="?page={{ items.next_page_number }}&t={{ topic }}&q={{ query|urlencode }}">
+            下一页 <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% endif %}
+
+    </ul>
+
+    <form class="form-inline pull-lg-right m-t-1 col-xl-3 col-lg-4">
+      <div class="form-group">
+
+        <input value="{{ query }}" name="q" type="hidden">
+        <input value="{{ topic }}" name="t" type="hidden">
+
+        <label for="page-number" class="sr-only">转到</label>
+
+        <div class="input-group">
+          <div class="input-group-addon">第</div>
+          <input value="{{ items.number }}" name="page" class="form-control" type="number" min="1" max="{{ items.paginator.num_pages }}" id="page-number">
+          <div class="input-group-addon">页</div>
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">转到</button>
+          </span>
+        </div>
+
+        <div class="small text-muted text-md-right">共 {{ items.paginator.num_pages }} 页</div>
+
+      </div>
+    </form>
+
+  </nav>
+
+{% endif %}

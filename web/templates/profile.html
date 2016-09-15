@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}个人中心 - {{ profile.user.username }}{% endblock %}
+{% block body %}
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li class="active">个人资料</li>
+    </ol>
+
+    <div class="row m-b-2">
+      <div class="col-md-4">
+        <div class="container">
+          <h1><img src="{{ profile.avatar }}?s=60" class="avatar" width="60" height="60"><small>{{ profile.user.username }}</small></h1>
+          <p><span class="label label-success">积分: {{ profile.reputation }}</span></p>
+          <blockquote>{{ profile.bio | default:'(这家伙很懒,没有留下什么)' }}
+            {% if user == profile.user %}<a href="{% url 'edit_profile' %}">编辑</a>{% endif %}</blockquote>
+
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <dl class="dl-horizontal m-l-0 m-r-0">
+          <dt class="col-xs-4 text-truncate text-lg-right col-lg-2">提交漏洞数</dt>
+          <dd class="col-xs-8 col-lg-4">{{ vuls.count | default:0 }}</dd>
+
+          {% if profile.department %}
+            <dt class="col-xs-4 text-truncate text-lg-right col-lg-2">学院部门</dt>
+            <dd class="col-xs-8 col-lg-4">{{ profile.department | default:'(未填)' }}</dd>
+          {% endif %}
+
+          {% if user.email %}
+            <dt class="col-xs-4 text-truncate text-lg-right col-lg-2">邮箱</dt>
+            <dd class="col-xs-8 col-lg-4">{{ profile.user.email | default:'(无)' }}</dd>
+          {% endif %}
+
+          {% if profile.site %}
+            <dt class="col-xs-4 text-truncate text-lg-right col-lg-2">个人网站</dt>
+            <dd class="col-xs-8 col-lg-4"><a target="_blank" href="{{ profile.site }}">{{ profile.site }}</a></dd>
+          {% endif %}
+
+          <dt class="col-xs-4 text-truncate text-lg-right col-lg-2">注册时间</dt>
+          <dd class="col-xs-8 col-lg-4">{{ profile.user.date_joined }}</dd>
+
+          <dt class="col-xs-4 text-truncate text-lg-right col-lg-2">上次登录</dt>
+          <dd class="col-xs-8 col-lg-4">{{ profile.user.last_login | default:' ' }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="container">
+          <h2><small>报告的漏洞</small></h2>
+          <ul class="list-unstyled m-t-1">
+            {% for vul in vuls %}
+              <li>
+                <span class="pull-xs-right">{{ vul.submitted | date:'DATE_FORMAT'}}</span>
+                {% include 'mixins/status.html' %}
+                <a href="{% url 'detail' author='member' vid=vul.id %}">{{ vul.title }}</a>
+              </li>
+            {% empty %}
+              <li>暂时还没有报告漏洞</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

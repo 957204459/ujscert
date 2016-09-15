@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}状态跟踪 - {{ vul.title }} {% endblock %}
+
+{% block body %}
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li class="active">漏洞跟踪</li>
+    </ol>
+
+    <h1>{{ vul.title }}</h1>
+
+    <div class="row">
+
+      <div class="col-sm-9">
+        <div class="container">
+          <dl class="dl-horizontal">
+            <dt class="col-xs-4 text-truncate">提交时间</dt>
+            <dd class="col-xs-8">{{ vul.submitted | date:"Y-m-d H:i" }}</dd>
+
+            <dt class="col-xs-4">状态</dt>
+            <dd class="col-xs-8">{% include 'mixins/status.html' %}</dd>
+
+          </dl>
+        </div>
+
+        <p>您可以将本页面网址加入收藏，跟踪漏洞修复进度：</p>
+        <p class="text-truncate"><a href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a></p>
+        <p>感谢您对江苏大学网络安全的支持！</p>
+
+      </div>
+
+    </div>
+
+  </div>
+{% endblock %}

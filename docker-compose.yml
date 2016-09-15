@@ -1,0 +1,26 @@
+web:
+  working_dir: /web
+  build: ./docker/web
+  volumes:
+    - ./web:/web
+    - ./docker/data/media:/web/media
+    - ./docker/web/ca:/web/ca
+  command: python manage.py runserver 0.0.0.0:8000
+  restart: 'true'
+  ports:
+    - "8000:8000"
+  links:
+    - db
+
+db:
+  build: ./docker/postgres
+  volumes:
+    - ./docker/data/pg:/var/lib/postgresql
+  expose:
+    - 5432
+  ports:
+    - 5432:5432
+  environment:
+    POSTGRES_USER: 'pguser'
+    POSTGRES_PASSWORD: 'pgpassword'
+    POSTGRES_DB: 'ujscert'

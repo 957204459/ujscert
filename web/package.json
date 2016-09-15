@@ -1,0 +1,23 @@
+{
+  "name": "security.ujs.edu.cn",
+  "private": "yes",
+  "version": "1.0.0",
+  "description": "Security response center",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@172.20.1.170:ChiChou/security-ujs-edu-cn.git"
+  },
+  "author": "ChiChou",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^4.0.0-alpha.2",
+    "font-awesome": "^4.6.1",
+    "jquery": "^2.2.2",
+    "jquery-jsonview": "^1.2.3",
+    "tether": "^1.2.0"
+  }
+}

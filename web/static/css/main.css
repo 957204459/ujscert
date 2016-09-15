@@ -1,0 +1,99 @@
+/* bootstrap theme */
+
+.form-control,
+.navbar {
+    border-radius: 0;
+}
+
+pre {
+    box-shadow: inset 0 0 2px rgba(177, 177, 177, 0.3);
+    overflow-y: auto;
+    word-break: break-all;
+    white-space: pre-wrap;
+    background: #fafafa;
+    padding: 10px;
+    color: #3a782e;
+    font-size: 12px;
+}
+
+/* */
+
+.bd-footer {
+    padding: 4rem 0;
+    margin-top: 4rem;
+    font-size: 85%;
+    background-color: #f7f7f7;
+}
+
+.bd-footer-links {
+    padding-left: 0;
+    margin-bottom: 1rem
+}
+
+.bd-footer-links li {
+    display: inline-block;
+}
+
+.bd-footer-links li + li {
+    margin-left: 1rem;
+}
+
+.bd-footer a {
+    font-weight: 500;
+    color: #55595c
+}
+
+.bd-footer a:hover {
+    color: #0275d8
+}
+
+.bd-content h1,
+.bd-content h2,
+.bd-content h3,
+.bd-content h4 {
+    color: #888;
+    font-weight: 100;
+    margin-bottom: 1rem;
+}
+
+.bd-content > h2:not(:first-child) {
+    margin-top: 3rem
+}
+
+.certificate {
+    font-size: 12px;
+    word-break: break-all;
+}
+
+.report {
+    margin-top: 2em;
+}
+
+.bg-muted {
+    background: #fafafa;
+}
+
+/* editor */
+.editor-toolbar {
+    float: right;
+}
+
+.errorlist {
+    color: #9d0000;
+    float: right;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 2px 6px;
+    margin: 4px 0 0 0;
+    background: #FFFFEF;
+    border: 1px solid rgba(216, 216, 163, 0.14);
+}
+
+.errorlist li {
+    display: inline-block;
+}
+
+.avatar {
+    border-radius: 6px;
+    margin-right: 10px;
+}

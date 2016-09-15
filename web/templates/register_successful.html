@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}注册成功{% endblock %}
+
+{% block head %}
+  <meta http-equiv="refresh" content="5; url={% url 'login' %}" />
+{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <p class="alert alert-success m-t-1 text-xs-center">感谢注册。您可以 <a href="{% url 'login' %}">立即登录</a>
+      或者 <a href="{% url 'home' %}">返回首页</a></p>
+  </div>
+{% endblock %}
