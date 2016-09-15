@@ -4,9 +4,12 @@
 
 ### 环境准备
 
+数据库使用安装了 zhparser 插件的 postgresql，可以通过 dockerhub 中的 codecolorist/zhparser-docker 直接获取，也可从 [zhparser-docker 源码](https://github.com/chichou/zhparser-docker/) 构建。
+
 1. 安装 docker 和 [docker-compose](https://docs.docker.com/compose/)
-1. 安装 git, 克隆仓库
-1. `docker-composer up· 运行
+2. 安装 git, 克隆仓库
+3. 源码构建或 `docker pull zhparser-docker`，使用 docker tag 重命名 image 为 zhparser-docker
+4. `docker-composer up` 运行
 
 ## 开发环境
 
