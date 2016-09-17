@@ -55,11 +55,14 @@ def submit_view(request):
                 'author': author,
             }
 
-            # send email to administrators
-            for user in User.objects.filter(is_staff=True, email__isnull=False):
-                send_rendered_mail(user.email, 'submission_alert', {
-                    'review_url': request.build_absolute_uri(reverse('detail', kwargs=redirect_args))
-                })
+            # 发送邮件至管理员
+            try:
+                for user in User.objects.filter(is_staff=True, email__isnull=False):
+                    send_rendered_mail(user.email, 'submission_alert', {
+                        'review_url': request.build_absolute_uri(reverse('detail', kwargs=redirect_args))
+                    })
+            except:
+                pass
 
             if not dest:
                 dest = redirect('detail', **redirect_args)
@@ -159,6 +162,7 @@ def update_profile_view(request):
 
 
 @require_http_methods(['GET', 'POST'])
+@transaction.atomic()
 @login_required
 def detail_view(request, author, vid):
     is_anonymous = author == 'anonymous'
@@ -178,10 +182,13 @@ def detail_view(request, author, vid):
                 form.save()
 
                 if is_anonymous and vul.email and status_before == STATUS_UNVERIFIED \
-                        and status_current > STATUS_UNVERIFIED and status_current != STATUS_IGNORED:
-                    invitation, created = Invitation.objects.get_or_create(email=vul.email)
-                    invite_url = request.build_absolute_uri(reverse('invite', kwargs={'code': invitation.code.hex}))
-                    send_rendered_mail(vul.email, 'invite', {'invite_url': invite_url})
+                        and status_current > STATUS_UNVERIFIED:
+                    if status_current != STATUS_IGNORED:
+                        send_rendered_mail(vul.email, 'ignored', {'vul': vul})
+                    else:
+                        invitation, created = Invitation.objects.get_or_create(email=vul.email)
+                        invite_url = request.build_absolute_uri(reverse('invite', kwargs={'code': invitation.code.hex}))
+                        send_rendered_mail(vul.email, 'invite', {'invite_url': invite_url})
 
                 # status has been changed
                 if status_current != status_before:
