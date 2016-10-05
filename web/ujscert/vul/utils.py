@@ -46,7 +46,7 @@ def send_rendered_mail(address, template_name='invite', args=None):
     site_title = getattr(settings, 'SITE_TITLE')
     templates = {
         'invite': '注册邀请',
-        'ignore': '报告被忽略',
+        'ignored': '报告被忽略',
         'submission_alert': '新的漏洞报告',
     }
 

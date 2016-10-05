@@ -183,7 +183,7 @@ def detail_view(request, author, vid):
 
                 if is_anonymous and vul.email and status_before == STATUS_UNVERIFIED \
                         and status_current > STATUS_UNVERIFIED:
-                    if status_current != STATUS_IGNORED:
+                    if status_current == STATUS_IGNORED:
                         send_rendered_mail(vul.email, 'ignored', {'vul': vul})
                     else:
                         invitation, created = Invitation.objects.get_or_create(email=vul.email)
