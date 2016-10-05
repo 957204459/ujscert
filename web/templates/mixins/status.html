@@ -4,6 +4,10 @@
   <span class="label label-danger">已确认</span>
 {% elif vul.status == 2 %}
   <span class="label label-info">已忽略</span>
-{% else %}
+{% elif vul.status == 3 %}
+  <span class="label label-warning">等待复查</span>
+{% elif vul.status == 4 %}
   <span class="label label-success">已修复</span>
+{% else %}
+  <span class="label label-success">已公开</span>
 {% endif %}

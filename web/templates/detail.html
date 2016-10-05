@@ -10,13 +10,14 @@
     </ol>
 
     <div class="row">
-      <div class="col-md-7">
-
+      <div class="col-lg-12">
         <div class="container">
           <h1 class="m-b-1"><span class="small">{{ vul.title }}</span></h1>
           <hr>
         </div>
+      </div>
 
+      <div class="col-md-7">
         <dl class="dl-horizontal m-l-0 m-r-0">
           <dt class="col-xs-4 col-md-2 text-truncate">提交时间</dt>
           <dd class="col-xs-8 col-md-4 text-truncate">{{ vul.submitted | date:"Y-m-d H:i" }}</dd>
@@ -59,16 +60,48 @@
       {% if user.is_superuser %}
         <div class="col-md-5">
           <div class="container">
-            <p class="alert alert-warning">
-              <span class="fa fa-clock-o"></span>
-              {% if is_anonymous %}
-                {{ vul.email|default:'匿名用户' }}
-              {% else %}
-                用户 <a href="{% url 'user_profile' uid=vul.author.id %}">{{ vul.author }}</a>
-              {% endif %}
+            <div class="events">
+              <ul class="timeline">
+                <li>
+                  <time>{{ vul.submitted }}</time>
 
-              在 {{ vul.submitted }} 报告了此问题
-            </p>
+                  {% if is_anonymous %}
+                    匿名用户 {{ vul.email }}
+                  {% else %}
+                    用户 <a href="{% url 'user_profile' uid=vul.author.id %}">{{ vul.author }}</a>
+                  {% endif %}
+                  报告了此问题
+                </li>
+                {% for event in events %}
+                  <li>
+                    <time>{{ event.timestamp }}</time>
+
+                    {% if event.extra.created %}
+                      提交了问题
+                    {% else %}
+                      漏洞状态变更为
+                      {% if event.extra.status == 1 %}
+                        已确认
+                      {% elif event.extra.status == 2 %}
+                        已忽略
+
+                      {% elif event.extra.status == 3 %}
+                        等待复查
+
+                      {% elif event.extra.status == 4 %}
+                        已修复
+
+                      {% elif event.extra.status == 5 %}
+                        已公开
+
+                      {% endif %}
+
+                    {% endif %}
+
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
 
             <form class="m-t-1" method="post">
               {{ form.non_field_errors }}
@@ -77,8 +110,8 @@
                 <div class="m-b-1">
                   {{ form.response.errors }}
                   <label for="id_response">答复</label>
-                    <textarea class="form-control" cols="40" id="id_response" maxlength="512" name="response"
-                              placeholder="漏洞的评价、致谢和修复方案" rows="6">{{ vul.response }}</textarea>
+                  <textarea class="form-control" cols="40" id="id_response" maxlength="512" name="response"
+                            placeholder="漏洞的评价、致谢和修复方案" rows="6">{{ vul.response }}</textarea>
                 </div>
 
                 <input type="hidden" name="score" value="{{ vul.score }}">
@@ -92,30 +125,16 @@
                   </button>
                 </div>
 
-              {% else %}
-                {% if vul.status != 2 %}
-                  <p class="alert alert-danger"><span class="fa fa-clock-o"></span> 漏洞已于 {{ vul.confirmed }}
-                    确认，正在指派责任单位修复中</p>
+              {% elif vul.status == 1 %}
+                <fieldset class="form-group">
+                  {{ form.score.errors }}
+                  <label for="id_score">评分</label>
+                  <input type="number" name="score" min=0 max=10 class="form-control" id="id_score"
+                         value="{{ vul.score }}" placeholder="评分">
+                  <small class="text-muted">按照漏洞危害评分，从 1 到 10</small>
+                </fieldset>
 
-                {% endif %}
-
-                {% if vul.status == 1 %}
-                  <fieldset class="form-group">
-                    {{ form.score.errors }}
-                    <label for="id_score">评分</label>
-                    <input type="number" name="score" min=0 max=10 class="form-control" id="id_score"
-                           value="{{ vul.score }}" placeholder="评分">
-                    <small class="text-muted">按照漏洞危害评分，从 1 到 10</small>
-                  </fieldset>
-
-                  <button type="submit" name="status" value="3" class="btn btn-primary">标记为已修复</button>
-
-                {% elif vul.status == 2 %}
-                  <p class="alert alert-info"><i class="fa fa-clock-o"></i> 漏洞已于 {{ vul.confirmed }} 被管理员忽略</p>
-
-                {% elif vul.status == 3 %}
-                  <p class="alert alert-success"><i class="fa fa-clock-o"></i> 漏洞已于 {{ vul.fixed }} 修复完成</p>
-                {% endif %}
+                <button type="submit" name="status" value="3" class="btn btn-primary">标记为已修复</button>
 
               {% endif %}
 
@@ -123,7 +142,6 @@
 
             </form>
           </div>
-
 
         </div>
       {% endif %}

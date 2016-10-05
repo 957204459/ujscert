@@ -41,6 +41,7 @@
             <li>
               <span class="pull-xs-right">{{ vul.submitted | date:'DATE_FORMAT' }}</span>
               {% include 'mixins/status.html' %}
+
               <a href="{% if vul.anonymous %}
                   {% url 'detail' author='anonymous' vid=vul.id %}
                 {% else %}

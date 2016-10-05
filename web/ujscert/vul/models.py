@@ -32,12 +32,10 @@ STATUS_CHOICES = (
     (STATUS_OPEN, '已公开'),  # 社区可见
 )
 
-TIMELINE_COMMENT = 0
-TIMELINE_CHANGE_STATUS = 1
-TIMELINE_BOUNTY = 2
+TIMELINE_CHANGE_STATUS = 0
+TIMELINE_BOUNTY = 1
 
 TIMELINE_CHOICES = (
-    (TIMELINE_COMMENT, '添加评论'),
     (TIMELINE_CHANGE_STATUS, '更新状态'),
     (TIMELINE_BOUNTY, '奖励变动'),
 )
@@ -111,11 +109,13 @@ class WhiteHat(models.Model):
 class AnonymousVul(Vul):
     ip = models.GenericIPAddressField()
     email = models.EmailField(blank=True, null=True)
+    anonymous = True
 
 
 class MemberVul(Vul):
     """会员提交漏洞"""
     author = models.ForeignKey(WhiteHat)
+    anonymous = False
 
 
 @receiver(post_delete, sender=MemberVul)
@@ -176,15 +176,48 @@ class Invitation(models.Model):
 
 class Timeline(models.Model):
     """事件"""
-    user = models.ForeignKey(User)
-    vul = models.ForeignKey(MemberVul)
-    event_type = models.IntegerField(choices=TIMELINE_CHOICES, default=TIMELINE_COMMENT)
+    vul = models.ForeignKey(Vul)
+    event_type = models.IntegerField(choices=TIMELINE_CHOICES, default=TIMELINE_CHANGE_STATUS)
     extra = JSONField(default={})
-    timestamp = models.DateTimeField(auto_created=True)
+    timestamp = models.DateTimeField(auto_created=True, auto_now_add=True)
     comment = models.CharField(max_length=1024)
 
     def __unicode__(self):
         return self.comment
+
+
+@receiver(post_save, sender=MemberVul)
+@receiver(post_save, sender=AnonymousVul)
+def vul_status_change(sender, instance, **kwargs):
+    timeline = Timeline(event_type=TIMELINE_CHANGE_STATUS, vul=instance)
+    timeline.extra = {}
+    if kwargs.get('created'):
+        timeline.extra.update({'created': True})
+    timeline.extra.update({'status': instance.status})
+    timeline.save()
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(WhiteHat)
+    timestamp = models.DateTimeField(auto_created=True, auto_now_add=True)
+    content = models.CharField(max_length=1024)
+    likes = models.IntegerField()
+
+    def __unicode__(self):
+        return self.content
+
+
+class LikeForComment(models.Model):
+    author = models.ForeignKey(WhiteHat)
+    timestamp = models.DateTimeField(auto_created=True, auto_now_add=True)
+    comment = models.ForeignKey(Comment)
+
+    def __unicode__(self):
+        comment = self.comment.content
+        max_len = 100
+        if len(comment) > max_len:
+            comment = comment[0:max_len] + '...'
+        return '%s liked "%s"' % (self.author.user.username, comment)
 
 
 class Income(models.Model):

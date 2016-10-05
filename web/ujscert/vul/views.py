@@ -20,7 +20,7 @@ from django.views.decorators.http import require_http_methods, require_POST, req
 from ujscert.headquarter.utils import staff_required
 from ujscert.vul.forms import AnonymousReportForm, ReportForm, ImageUploadForm, LoginForm, ProfileForm, ReviewForm
 from ujscert.vul.models import Vul, MemberVul, WhiteHat, AnonymousVul, Invitation, \
-    STATUS_CHOICES, STATUS_UNVERIFIED, STATUS_CONFIRMED, STATUS_FIXED, STATUS_IGNORED
+    STATUS_CHOICES, STATUS_UNVERIFIED, STATUS_CONFIRMED, STATUS_FIXED, STATUS_IGNORED, Timeline
 from ujscert.vul.utils import send_rendered_mail, get_client_ip
 
 
@@ -210,9 +210,11 @@ def detail_view(request, author, vid):
         vul = get_object_or_404(MemberVul, author=whitehat, pk=vid)
         form = None
 
+    events = Timeline.objects.filter(vul=vul)
     return render(request, 'detail.html', {
         'vul': vul,
         'form': form,
+        'events': events,
         'is_anonymous': is_anonymous,
         'status_choices': STATUS_CHOICES,
     })
