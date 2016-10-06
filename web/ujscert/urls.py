@@ -37,6 +37,7 @@ urlpatterns = [
 
     url(r'^profile/(?P<uid>\d+)$', views.profile_view, name='user_profile'),
     url(r'^detail/(?P<author>anonymous|member|all)/(?P<vid>\d+)$', views.detail_view, name='detail'),
+    url(r'^comment/add/(?P<vid>\d+)', views.add_comment_view, name='add_comment'),
     url(r'^track/(?P<track_id>[0-9a-f]+)$', views.track_view, name='track'),
 
     url(r'^review/(?P<author>anonymous|member|all)/(?P<status>\d+|all)$', views.review_list_view, name='review'),

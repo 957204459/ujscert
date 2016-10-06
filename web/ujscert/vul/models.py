@@ -19,8 +19,8 @@ from django.forms import forms
 STATUS_UNVERIFIED = 0
 STATUS_CONFIRMED = 1
 STATUS_IGNORED = 2
-STATUS_FIXED = 3
-STATUS_TO_REVIEW = 4
+STATUS_TO_REVIEW = 3
+STATUS_FIXED = 4
 STATUS_OPEN = 5
 
 STATUS_CHOICES = (
@@ -186,22 +186,12 @@ class Timeline(models.Model):
         return self.comment
 
 
-@receiver(post_save, sender=MemberVul)
-@receiver(post_save, sender=AnonymousVul)
-def vul_status_change(sender, instance, **kwargs):
-    timeline = Timeline(event_type=TIMELINE_CHANGE_STATUS, vul=instance)
-    timeline.extra = {}
-    if kwargs.get('created'):
-        timeline.extra.update({'created': True})
-    timeline.extra.update({'status': instance.status})
-    timeline.save()
-
-
 class Comment(models.Model):
     author = models.ForeignKey(WhiteHat)
+    vul = models.ForeignKey(Vul)
     timestamp = models.DateTimeField(auto_created=True, auto_now_add=True)
     content = models.CharField(max_length=1024)
-    likes = models.IntegerField()
+    likes = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.content

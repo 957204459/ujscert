@@ -4,15 +4,19 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms import Textarea
 from django.forms.widgets import Input, Select, CheckboxInput
-from ujscert.vul.models import AnonymousVul, MemberVul, Image, WhiteHat, Vul
+from ujscert.vul.models import AnonymousVul, MemberVul, Image, WhiteHat, Vul, Comment
 
 bs4_form = {'attrs': {'class': 'form-control'}}
 
 
-class ReportForm(forms.ModelForm):
-    captcha = CaptchaField(label='验证码(点击图片刷新)', error_messages={
+def make_captcha():
+    return CaptchaField(label='验证码(点击图片刷新)', error_messages={
         'invalid': '验证码错误',
         'required': '验证码不能为空'})
+
+
+class ReportForm(forms.ModelForm):
+    captcha = make_captcha()
 
     class Meta:
         model = MemberVul
@@ -44,9 +48,7 @@ class ReportForm(forms.ModelForm):
 
 
 class AnonymousReportForm(ReportForm):
-    captcha = CaptchaField(label='验证码(点击图片刷新)', error_messages={
-        'invalid': '验证码错误',
-        'required': '验证码不能为空'})
+    captcha = make_captcha()
 
     class Meta:
         model = AnonymousVul
@@ -77,9 +79,7 @@ class ImageUploadForm(forms.ModelForm):
 
 
 class LoginForm(AuthenticationForm):
-    captcha = CaptchaField(label='验证码', error_messages={
-        'invalid': '验证码错误',
-        'required': '验证码不能为空'})
+    captcha = make_captcha()
 
 
 class ProfileForm(forms.ModelForm):
@@ -105,3 +105,10 @@ class ReviewForm(forms.ModelForm):
         model = Vul
         fields = ('status', 'score', 'response')
 
+
+class CommentForm(forms.ModelForm):
+    captcha = make_captcha()
+
+    class Meta:
+        model = Comment
+        fields = ('content',)

@@ -18,9 +18,11 @@ from django.utils.http import is_safe_url, urlencode
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
 from ujscert.headquarter.utils import staff_required
-from ujscert.vul.forms import AnonymousReportForm, ReportForm, ImageUploadForm, LoginForm, ProfileForm, ReviewForm
+from ujscert.vul.forms import AnonymousReportForm, ReportForm, ImageUploadForm, LoginForm, ProfileForm, ReviewForm, \
+    CommentForm
 from ujscert.vul.models import Vul, MemberVul, WhiteHat, AnonymousVul, Invitation, \
-    STATUS_CHOICES, STATUS_UNVERIFIED, STATUS_CONFIRMED, STATUS_FIXED, STATUS_IGNORED, Timeline
+    STATUS_CHOICES, STATUS_UNVERIFIED, STATUS_CONFIRMED, STATUS_FIXED, STATUS_IGNORED, \
+    STATUS_TO_REVIEW, Comment, Timeline, TIMELINE_CHANGE_STATUS
 from ujscert.vul.utils import send_rendered_mail, get_client_ip
 
 
@@ -41,13 +43,15 @@ def submit_view(request):
             if request.user.is_authenticated():
                 entry.author = WhiteHat.objects.get(user=request.user)
                 author = 'member'
+                anonymous = False
             else:
                 entry.ip = get_client_ip(request)
                 dest = redirect('track', track_id=entry.uuid.hex)
                 author = 'anonymous'
+                anonymous = True
 
             entry.save()
-            entry.vul_ptr.anonymous = False
+            entry.vul_ptr.anonymous = anonymous
             entry.vul_ptr.save()
 
             redirect_args = {
@@ -161,6 +165,25 @@ def update_profile_view(request):
         context_instance=RequestContext(request))
 
 
+@require_POST
+@transaction.atomic()
+@login_required
+def add_comment_view(request, vid):
+    form = CommentForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest(form.errors.as_json())
+
+    whitehat = WhiteHat.objects.get(user=request.user)
+    if not (request.user.is_staff and request.user.is_superuser):
+        vul = get_object_or_404(MemberVul, author=whitehat, pk=vid)
+    else:
+        vul = get_object_or_404(Vul, pk=vid)
+
+    comment = Comment(content=form.data.get('content'), vul=vul, author=whitehat)
+    comment.save()
+    return redirect('detail', author='anonymous' if vul.anonymous else 'member', vid=vul.pk)
+
+
 @require_http_methods(['GET', 'POST'])
 @transaction.atomic()
 @login_required
@@ -170,39 +193,46 @@ def detail_view(request, author, vid):
 
     if request.user.is_staff or request.user.is_superuser:
         vul = get_object_or_404(model, pk=vid)
+        status_before = vul.status
 
         if request.method == 'GET':
             form = ReviewForm(instance=vul)
         else:
             form = ReviewForm(request.POST, instance=vul)
-            status_before = vul.status
 
-            if form.is_valid():
-                status_current = form.cleaned_data['status']
-                form.save()
+            if not form.is_valid():
+                return HttpResponseBadRequest()
 
-                if is_anonymous and vul.email and status_before == STATUS_UNVERIFIED \
-                        and status_current > STATUS_UNVERIFIED:
-                    if status_current == STATUS_IGNORED:
-                        send_rendered_mail(vul.email, 'ignored', {'vul': vul})
-                    else:
-                        invitation, created = Invitation.objects.get_or_create(email=vul.email)
-                        invite_url = request.build_absolute_uri(reverse('invite', kwargs={'code': invitation.code.hex}))
-                        send_rendered_mail(vul.email, 'invite', {'invite_url': invite_url})
+            status_current = form.cleaned_data['status']
+            form.save()
 
-                # status has been changed
-                if status_current != status_before:
-                    if status_current in (STATUS_CONFIRMED, STATUS_IGNORED):
-                        vul.confirmed = datetime.now()
+            if is_anonymous and vul.email and status_before == STATUS_UNVERIFIED:
+                if status_current == STATUS_IGNORED:
+                    send_rendered_mail(vul.email, 'ignored', {'vul': vul})
+                elif status_current == STATUS_CONFIRMED:
+                    invitation, created = Invitation.objects.get_or_create(email=vul.email)
+                    invite_url = request.build_absolute_uri(reverse('invite', kwargs={'code': invitation.code.hex}))
+                    send_rendered_mail(vul.email, 'invite', {'invite_url': invite_url})
+                elif status_current == STATUS_TO_REVIEW:
+                    vul.status = status_current = STATUS_FIXED
 
-                    elif status_current == STATUS_FIXED:
-                        vul.fixed = datetime.now()
+            # status has been changed
+            if status_current != status_before:
+                timeline = Timeline(event_type=TIMELINE_CHANGE_STATUS, vul=vul)
+                timeline.extra = {'status': vul.status}
+                timeline.save()
 
-                vul.save()
+                if status_current in (STATUS_CONFIRMED, STATUS_IGNORED):
+                    vul.confirmed = datetime.now()
 
-                response = redirect('detail', author=author, vid=vid)
-                response['Location'] += '?success'
-                return response
+                elif status_current == STATUS_FIXED:
+                    vul.fixed = datetime.now()
+
+            vul.save()
+
+            response = redirect('detail', author=author, vid=vid)
+            response['Location'] += '?success'
+            return response
 
     else:
         # only show vul report by user itself
@@ -210,11 +240,16 @@ def detail_view(request, author, vid):
         vul = get_object_or_404(MemberVul, author=whitehat, pk=vid)
         form = None
 
-    events = Timeline.objects.filter(vul=vul)
+    events = Timeline.objects.filter(vul=vul).order_by('timestamp')
+    comments = Comment.objects.filter(vul=vul).order_by('timestamp')
+    comment_form = CommentForm()
+
     return render(request, 'detail.html', {
         'vul': vul,
         'form': form,
+        'comment_form': comment_form,
         'events': events,
+        'comments': comments,
         'is_anonymous': is_anonymous,
         'status_choices': STATUS_CHOICES,
     })
@@ -231,18 +266,12 @@ def review_list_view(request, author, status=0):
     model_map = {'all': Vul, 'member': MemberVul, 'anonymous': AnonymousVul}
 
     if author not in model_map:
-        raise HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     model = model_map[author]
 
     if status != 'all':
-        try:
-            status = int(status)
-        except ValueError:
-            raise HttpResponseBadRequest
-        except TypeError:
-            raise HttpResponseBadRequest
-
+        status = int(status)
         reviews = model.objects.filter(status=status)
     else:
         reviews = model.objects.all()

@@ -55,77 +55,100 @@
           <p>{{ vul.response }}</p>
         </div>
 
+        <div class="container">
+          <hr>
+
+          <ul class="comments list-unstyled">
+            {% for comment in comments %}
+              <li>
+                <img src="{{ comment.author.avatar }}?s=40" class="avatar" width="40" height="40">
+
+                <div class="content">
+                  <p>{{ comment.author.user.username }} <time>{{ comment.timestamp }}</time></p>
+                  <p>{{ comment.content }}</p>
+                </div>
+
+              </li>
+            {% empty %}
+              暂无评论
+            {% endfor %}
+          </ul>
+
+          <form class="m-t-1" method="post" action="{% url 'add_comment' vid=vul.id %}">
+            <fieldset class="form-group">
+              {{ comment_form.response.errors }}
+              <textarea class="form-control" cols="40" maxlength="512" name="content"
+                        placeholder="发表自己的看法" rows="2"></textarea>
+
+            </fieldset>
+
+            <fieldset class="form-group row">
+              <div class="col-sm-7 m-b-1">
+                {{ comment_form.captcha }}
+              </div>
+              <div class="col-sm-5 text-md-right">
+                <button type="submit" class="btn btn-success">评论</button>
+              </div>
+            </fieldset>
+
+            {% csrf_token %}
+
+          </form>
+        </div>
+
       </div>
 
-      {% if user.is_superuser %}
-        <div class="col-md-5">
+      <div class="col-md-5">
+        <div class="events">
+          <ul class="timeline list-unstyled">
+            <li>
+              <time>{{ vul.submitted }}</time>
+
+              {% if is_anonymous %}
+                匿名用户 {{ vul.email }}
+              {% else %}
+                用户 <a href="{% url 'user_profile' uid=vul.author.id %}">{{ vul.author }}</a>
+              {% endif %}
+              报告了此问题
+            </li>
+            {% for event in events %}
+              <li>
+                <time>{{ event.timestamp }}</time>
+                漏洞状态变更为
+
+                {% if event.extra.status == 1 %}
+                  已确认
+                {% elif event.extra.status == 2 %}
+                  已忽略
+
+                {% elif event.extra.status == 3 %}
+                  等待复查
+
+                {% elif event.extra.status == 4 %}
+                  已修复
+
+                {% elif event.extra.status == 5 %}
+                  已公开
+
+                {% endif %}
+
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {% if user.is_superuser %}
           <div class="container">
-            <div class="events">
-              <ul class="timeline">
-                <li>
-                  <time>{{ vul.submitted }}</time>
-
-                  {% if is_anonymous %}
-                    匿名用户 {{ vul.email }}
-                  {% else %}
-                    用户 <a href="{% url 'user_profile' uid=vul.author.id %}">{{ vul.author }}</a>
-                  {% endif %}
-                  报告了此问题
-                </li>
-                {% for event in events %}
-                  <li>
-                    <time>{{ event.timestamp }}</time>
-
-                    {% if event.extra.created %}
-                      提交了问题
-                    {% else %}
-                      漏洞状态变更为
-                      {% if event.extra.status == 1 %}
-                        已确认
-                      {% elif event.extra.status == 2 %}
-                        已忽略
-
-                      {% elif event.extra.status == 3 %}
-                        等待复查
-
-                      {% elif event.extra.status == 4 %}
-                        已修复
-
-                      {% elif event.extra.status == 5 %}
-                        已公开
-
-                      {% endif %}
-
-                    {% endif %}
-
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
 
             <form class="m-t-1" method="post">
               {{ form.non_field_errors }}
 
-              {% if vul.status == 0 %}
-                <div class="m-b-1">
-                  {{ form.response.errors }}
-                  <label for="id_response">答复</label>
-                  <textarea class="form-control" cols="40" id="id_response" maxlength="512" name="response"
-                            placeholder="漏洞的评价、致谢和修复方案" rows="6">{{ vul.response }}</textarea>
-                </div>
+              <div class="m-b-1">
+                {{ form.response.errors }}
+                <label for="id_response">答复</label>
+                <textarea class="form-control" cols="40" id="id_response" maxlength="512" name="response"
+                          placeholder="漏洞的评价、致谢和修复方案" rows="6">{{ vul.response }}</textarea>
 
-                <input type="hidden" name="score" value="{{ vul.score }}">
-
-                <div class="btn-group">
-                  <button type="submit" name="status" value="1" class="btn btn-primary"><i
-                      class="fa fa-check-circle-o"></i> 确认问题存在
-                  </button>
-                  <button type="submit" name="status" value="2" class="btn btn-secondary"><i
-                      class="fa fa-times-circle-o"></i> 忽略
-                  </button>
-                </div>
-
-              {% elif vul.status == 1 %}
                 <fieldset class="form-group">
                   {{ form.score.errors }}
                   <label for="id_score">评分</label>
@@ -134,17 +157,33 @@
                   <small class="text-muted">按照漏洞危害评分，从 1 到 10</small>
                 </fieldset>
 
-                <button type="submit" name="status" value="3" class="btn btn-primary">标记为已修复</button>
+                <fieldset class="form-group">
+                  {{ form.status.errors }}
+                  <label for="id_status">状态</label>
+                  <select name="status" id="id_status" class="form-control">
+                    {% for i, label in status_choices %}
+                      <option value="{{ i }}" {% if i == vul.status %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </fieldset>
 
-              {% endif %}
+                <fieldset class="form-group">
+                  <button type="submit" class="btn btn-primary"><i
+                      class="fa fa-check-circle-o"></i> 保存
+                  </button>
+                </fieldset>
+
+              </div>
 
               {% csrf_token %}
 
             </form>
           </div>
 
-        </div>
-      {% endif %}
+
+        {% endif %}
+      </div>
+
     </div>
 
   </div>
