@@ -16,3 +16,14 @@ class Admin(admin.ModelAdmin):
 @admin.register(Vul, AnonymousVul, MemberVul)
 class VulAdmin(admin.ModelAdmin):
     list_filter = ('status', 'category')
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_filter = ('author',)
+
+    formfield_overrides = {
+        models.CharField: {'widget': Textarea(
+            attrs={'rows': 8,
+                   'cols': 40})},
+    }

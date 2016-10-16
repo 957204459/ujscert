@@ -69,9 +69,6 @@ class Vul(models.Model):
     def __str__(self):
         return self.title
 
-    def __unicode__(self):
-        return self.title
-
 
 @receiver(post_save, sender=User)
 def add_white_hat(sender, instance, **kwargs):
@@ -100,9 +97,6 @@ class WhiteHat(models.Model):
         return "https://cn.gravatar.com/avatar/%s" % avatar_hash
 
     def __str__(self):
-        return self.user.username
-
-    def __unicode__(self):
         return self.user.username
 
 
@@ -170,7 +164,7 @@ class Invitation(models.Model):
     expired = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s - %s' % (self.code, self.email)
 
 
@@ -182,7 +176,7 @@ class Timeline(models.Model):
     timestamp = models.DateTimeField(auto_created=True, auto_now_add=True)
     comment = models.CharField(max_length=1024)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.comment
 
 
@@ -193,8 +187,8 @@ class Comment(models.Model):
     content = models.CharField(max_length=1024)
     likes = models.IntegerField(default=0)
 
-    def __unicode__(self):
-        return self.content
+    def __str__(self):
+        return '%s: %s' % (self.author.user.username, self.content)
 
 
 class LikeForComment(models.Model):
@@ -202,7 +196,7 @@ class LikeForComment(models.Model):
     timestamp = models.DateTimeField(auto_created=True, auto_now_add=True)
     comment = models.ForeignKey(Comment)
 
-    def __unicode__(self):
+    def __str__(self):
         comment = self.comment.content
         max_len = 100
         if len(comment) > max_len:
@@ -217,7 +211,7 @@ class Income(models.Model):
     reason = models.CharField(max_length=256)
     timestamp = models.DateTimeField(auto_created=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s %d' % (self.user.username, self.cost)
 
 
@@ -227,5 +221,5 @@ class Reward(models.Model):
     purchased = models.IntegerField()  # 已兑换
     available = models.IntegerField()  # 余量
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
