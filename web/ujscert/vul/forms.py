@@ -3,7 +3,7 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms import Textarea
-from django.forms.widgets import Input, Select, CheckboxInput
+from django.forms.widgets import Input, Select
 from ujscert.vul.models import AnonymousVul, MemberVul, Image, WhiteHat, Vul, Comment
 
 bs4_form = {'attrs': {'class': 'form-control'}}

@@ -159,3 +159,9 @@ pre {
     font-size: 12px;
     color: #aaa;
 }
+
+.invalid-captcha {
+    display: none;
+    font-size: 12px;
+    color: #ff4136;
+}

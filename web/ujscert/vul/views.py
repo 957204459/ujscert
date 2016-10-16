@@ -169,6 +169,9 @@ def update_profile_view(request):
 @transaction.atomic()
 @login_required
 def add_comment_view(request, vid):
+    if not request.is_ajax():
+        return HttpResponseBadRequest()
+
     form = CommentForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest(form.errors.as_json())
@@ -181,7 +184,7 @@ def add_comment_view(request, vid):
 
     comment = Comment(content=form.data.get('content'), vul=vul, author=whitehat)
     comment.save()
-    return redirect('detail', author='anonymous' if vul.anonymous else 'member', vid=vul.pk)
+    return JsonResponse({'status': 'ok'})
 
 
 @require_http_methods(['GET', 'POST'])

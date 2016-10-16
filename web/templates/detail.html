@@ -76,7 +76,7 @@
             {% endfor %}
           </ul>
 
-          <form class="m-t-1" method="post" action="{% url 'add_comment' vid=vul.id %}">
+          <form id="comment-form" class="m-t-1" method="post" action="{% url 'add_comment' vid=vul.id %}">
             <fieldset class="form-group">
               {{ comment_form.response.errors }}
               <textarea class="form-control" cols="40" maxlength="512" name="content"
@@ -87,6 +87,7 @@
             <fieldset class="form-group row">
               <div class="col-sm-7 m-b-1">
                 {{ comment_form.captcha }}
+                <span class="invalid-captcha">验证码错误</span>
               </div>
               <div class="col-sm-5 text-md-right">
                 <button type="submit" class="btn btn-success">评论</button>
@@ -96,6 +97,7 @@
             {% csrf_token %}
 
           </form>
+
         </div>
 
       </div>
@@ -182,7 +184,6 @@
             </form>
           </div>
 
-
         {% endif %}
       </div>
 
@@ -193,4 +194,23 @@
 
 {% block scripts %}
   <script type="text/javascript" src="{% static 'js/markd.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/captcha.js' %}"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      var $form = $('#comment-form');
+      $form.on('submit', function (e) {
+        e.preventDefault();
+        $.post($form.attr('action'), $form.serialize())
+            .done(function () {
+              location.reload()
+            })
+            .fail(function () {
+              $form.find('.invalid-captcha').show();
+              $form.find('textarea').focus();
+            })
+      })
+    });
+  </script>
+
 {% endblock %}
