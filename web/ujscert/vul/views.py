@@ -246,8 +246,9 @@ def detail_view(request, author, vid):
     events = Timeline.objects.filter(vul=vul).order_by('timestamp')
     comments = Comment.objects.filter(vul=vul).order_by('timestamp')
     comment_form = CommentForm()
+    template_name = 'detail_print.html' if 'print' in request.GET else 'detail.html'
 
-    return render(request, 'detail.html', {
+    return render(request, template_name, {
         'vul': vul,
         'form': form,
         'comment_form': comment_form,

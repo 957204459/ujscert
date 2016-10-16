@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Security Response Center of Jiangsu University">
+  <meta name="author" content="ChiChou">
+
+  <title>漏洞详情 - {{ vul.title }}</title>
+  <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'tether/dist/css/tether.min.css' %}">
+  <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  {% block head %}{% endblock %}
+
+</head>
+<body>
+  <div class="container m-t-1">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="container">
+          <h1 class="m-b-1"><span class="small">{{ vul.title }}</span></h1>
+          <hr>
+        </div>
+      </div>
+
+      <div class="col-lg-12">
+        <dl class="dl-horizontal m-l-0 m-r-0">
+          <dt class="col-xs-4 col-md-2 text-truncate">提交时间</dt>
+          <dd class="col-xs-8 col-md-4 text-truncate">{{ vul.submitted | date:"Y-m-d H:i" }}</dd>
+
+          <dt class="col-xs-4 col-md-2 text-truncate">状态</dt>
+          <dd class="col-xs-8 col-md-4 text-truncate">{% include 'mixins/status.html' %}</dd>
+
+          <dt class="col-xs-4 col-md-2 text-truncate">确认时间</dt>
+          <dd class="col-xs-8 col-md-4 text-truncate">{{ vul.confirmed | date:"Y-m-d H:i" | default:"暂未" }}</dd>
+
+          <dt class="col-xs-4 col-md-2 text-truncate">修复时间</dt>
+          <dd class="col-xs-8 col-md-4 text-truncate">{{ vul.fixed| date:"Y-m-d H:i" | default:"暂未" }}</dd>
+
+          {% if is_anonymous %}
+            <dt class="col-xs-4 col-md-2 text-truncate">来源 IP</dt>
+            <dd class="col-xs-8 col-md-4 text-truncate">{{ vul.ip }}</dd>
+
+            <dt class="col-xs-4 col-md-2 text-truncate">作者邮箱</dt>
+            <dd class="col-xs-8 col-md-4 text-truncate">{{ vul.email | default:'无' }}</dd>
+
+          {% else %}
+            <dt class="col-xs-4 col-md-2 text-truncate">作者</dt>
+            <dd class="col-xs-8 col-md-4 text-truncate">
+              <a href="{% url 'user_profile' uid=vul.author.id %}">{{ vul.author }}</a></dd>
+
+          {% endif %}
+        </dl>
+
+        <div class="container">
+          <hr>
+          <p><strong>漏洞详情:</strong></p>
+          <pre data-render="markd">{{ vul.detail }}</pre>
+          <hr>
+          <p><strong>管理员答复:</strong></p>
+          <p>{{ vul.response }}</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="text/javascript" src="{% static 'js/markd.js' %}"></script>
+  <script type="text/javascript">
+    print();
+    close();
+  </script>
+
+</body>
+</html>
