@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}礼品兑换{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li class="active">礼品兑换</li>
+    </ol>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <ul class="list-unstyled row rewards">
+          {% for reward in rewards %}
+            <li class="col-lg-3 col-sm-6">
+              <div class="card">
+                <a href="{% url 'reward_detail' rid=reward.id %}">
+                  <img src="{{ reward.img.url }}" alt="" class="card-img-top img-fluid">
+                  <article class="card-block">
+                    <h4 class="card-title">{{ reward.title }}</h4>
+                    <p class="card-text"><span class="price">{{ reward.price }}</span> 积分
+                      已兑换 <span class="purchased">{{ reward.purchased }}</span> 个</p>
+                  </article>
+                </a>
+              </div>
+            </li>
+          {% empty %}
+            <div class="alert alert-info">没有符合条件的结果</div>
+          {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="container">
+      {% include 'paginator.html' %}
+    </div>
+
+  </div>
+{% endblock %}
+

@@ -216,7 +216,9 @@ class Income(models.Model):
 
 
 class Reward(models.Model):
-    title = models.CharField(max_length=64)
+    title = models.CharField(max_length=64) # 名字
+    intro = models.TextField(blank=True, max_length=200)  # 简介
+    img = models.ImageField(upload_to=image_name, default='')  # 图片
     price = models.IntegerField()  # 售价
     purchased = models.IntegerField()  # 已兑换
     available = models.IntegerField()  # 余量

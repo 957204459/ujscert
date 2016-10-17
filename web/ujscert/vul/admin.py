@@ -4,7 +4,7 @@ from django.forms import Textarea
 from ujscert.vul.models import *
 
 
-@admin.register(Image, WhiteHat, Invitation)
+@admin.register(Image, WhiteHat, Invitation, Reward)
 class Admin(admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {'widget': Textarea(
@@ -20,8 +20,6 @@ class VulAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_filter = ('author',)
-
     formfield_overrides = {
         models.CharField: {'widget': Textarea(
             attrs={'rows': 8,

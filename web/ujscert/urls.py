@@ -40,6 +40,9 @@ urlpatterns = [
     url(r'^comment/add/(?P<vid>\d+)', views.add_comment_view, name='add_comment'),
     url(r'^track/(?P<track_id>[0-9a-f]+)$', views.track_view, name='track'),
 
+    url(r'^shop$', views.rewards_list_view, name='shop'),
+    url(r'^shop/item/(?P<rid>\d+)', views.reward_detail_view, name='reward_detail'),
+
     url(r'^review/(?P<author>anonymous|member|all)/(?P<status>\d+|all)$', views.review_list_view, name='review'),
     url(r'^register/(?P<code>[0-9a-f]+)$', views.register_view, name='invite'),
     url(r'^register/successful$', TemplateView.as_view(template_name='register_successful.html'),

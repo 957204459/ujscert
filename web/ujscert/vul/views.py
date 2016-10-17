@@ -20,7 +20,7 @@ from django.views.decorators.http import require_http_methods, require_POST, req
 from ujscert.headquarter.utils import staff_required
 from ujscert.vul.forms import AnonymousReportForm, ReportForm, ImageUploadForm, LoginForm, ProfileForm, ReviewForm, \
     CommentForm
-from ujscert.vul.models import Vul, MemberVul, WhiteHat, AnonymousVul, Invitation, \
+from ujscert.vul.models import Vul, MemberVul, WhiteHat, AnonymousVul, Invitation, Reward, \
     STATUS_CHOICES, STATUS_UNVERIFIED, STATUS_CONFIRMED, STATUS_FIXED, STATUS_IGNORED, \
     STATUS_TO_REVIEW, Comment, Timeline, TIMELINE_CHANGE_STATUS
 from ujscert.vul.utils import send_rendered_mail, get_client_ip
@@ -342,3 +342,25 @@ def register_view(request, code):
 def rank_view(request):
     top10 = WhiteHat.objects.filter(public=True).order_by('-reputation')[:10]
     return render(request, 'rank.html', {'top10': top10})
+
+
+@require_GET
+def rewards_list_view(request):
+    page = request.GET.get('page', '1')
+    rewards = Reward.objects.all()
+    paginator = Paginator(rewards, 20)
+
+    try:
+        rewards = paginator.page(page)
+    except PageNotAnInteger:
+        rewards = paginator.page(1)
+    except EmptyPage:
+        rewards = paginator.page(paginator.num_pages)
+
+    return render(request, 'rewards_shop_list.html', {'rewards': rewards})
+
+
+@require_GET
+def reward_detail_view(request, rid):
+    reward = get_object_or_404(Reward, id=rid)
+    return render(request, 'reward_item_detail.html', {'reward': reward})

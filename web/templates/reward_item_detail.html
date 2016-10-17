@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}礼品详情 - {{ reward.title }}{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+  <div class="container m-t-1">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'home' %}">首页</a></li>
+      <li><a href="{% url 'shop' %}">礼品兑换</a></li>
+      <li class="active">{{ reward.title }}</li>
+    </ol>
+
+    <div class="row m-t-2">
+      <div class="col-lg-6 m-b-2">
+        <img src="{{ reward.img.url }}" class="img-fluid m-b-1">
+      </div>
+
+      <div class="col-lg-6">
+        <h1 class="text-sm-center text-md-left">{{ reward.title }}</h1>
+        <p>{{ reward.intro }}</p>
+        <hr>
+
+        <div class="row m-b-1">
+          <div class="col-xs-4">兑换价格:</div>
+          <div class="col-xs-8"><span class="price">{{ reward.price }}</span> 积分</div>
+        </div>
+
+        <div class="row m-b-1">
+          <div class="col-xs-4">已兑换:</div>
+          <div class="col-xs-8"><span class="purchased">{{ reward.purchased }}</span> 件</div>
+        </div>
+
+        <form>
+          <fieldset class="form-inline row m-b-2">
+            <label class="col-xs-4" for="id-count">兑换数量:</label>
+            <div class="col-xs-8">
+              <input class="form-control" name="count" type="number" min="1" value="1" max="{{ reward.available }}" id="id-count">
+              <span class="remain m-l-1">剩余 {{ reward.available }}</span>
+            </div>
+
+          </fieldset>
+
+          <div class="row">
+            <div class="container">
+              <button class="btn btn-primary btn-lg">立即兑换</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+
+    </div>
+
+    <div class="container">
+      {% include 'paginator.html' %}
+    </div>
+
+  </div>
+{% endblock %}
+
